@@ -1,4 +1,4 @@
-package problems;
+package problem;
 
 /**
  * Represents a player's mark in Tic-Tac-Toe.
@@ -9,5 +9,5 @@ package problems;
  * Note that, when comparing enum values in Java,
  * always use ==, not equals()
  */
-public enum Mark{X, O}
+public enum Mark{R, B}
 

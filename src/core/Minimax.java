@@ -1,6 +1,6 @@
 package core_algorithms;
 
-import problems.Game;
+import problem.Game;
 
 import java.util.ArrayList;
 import java.util.List;

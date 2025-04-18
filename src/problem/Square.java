@@ -1,4 +1,4 @@
-package problems;
+package problem;
 
     /**
      * Represents a square on a Tic-Tac-Toe board.
