@@ -1,4 +1,4 @@
-package core_algorithms;
+package core;
 
 import problem.Game;
 

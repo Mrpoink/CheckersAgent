@@ -22,7 +22,8 @@ public class Checkers implements Game<Square> {
             return true;
         }
         //If no one won, game is a draw or unfinished
-        return board.size() = BOARD_SIZE * BOARD_SIZE;
+
+        return board.size() == BOARD_SIZE * BOARD_SIZE;
     }
 
     public void execute(Square move, boolean isMax){
@@ -79,16 +80,16 @@ public class Checkers implements Game<Square> {
         //Only remaining moves can be in diagonals
         //Going to have to include bit where it limits the amount of rows
         List<Square> result = new ArrayList<>();
-        for (int row = 0; row < BOARD_SIZE; row++) {
-            Square square = new Square(row, row);
-            Square uright_di = new Square(row + 1, row + 1);
-            Square dleft_di = new Square(row - 1, row - 1);
-            Square dright_di = new Square(row + 1, row - 1);
-            Square uleft_di = new Square(row - 1, row + 1);
+        for (int x = 0; x < BOARD_SIZE; x++) {
+            Square square = new Square(x,x);
+            Square uright_di = new Square(x + 1, x + 1); //upper right
+            Square dleft_di = new Square(x - 1, x - 1); //lower left
+            Square dright_di = new Square(x + 1, x - 1); //lower right
+            Square uleft_di = new Square(x - 1, x + 1); //upper left
             if (!board.containsKey(square)) {
                 result.add(square);
             }
-            //Adds diagonals to possible moves
+            //Adds moves to possible moves if the move is not already there
             else if (!board.containsKey(uright_di)) {
                 result.add(uright_di);
             } else if (!board.containsKey(dleft_di)) {
@@ -100,13 +101,13 @@ public class Checkers implements Game<Square> {
             }
             //Adds jumps to possible moves
             else if (board.get(uright_di) == Mark.B) {
-                if (!board.containsKey(new Square(row + 2, row + 2))) result.add(new Square(row + 2, row + 2));
+                if (!board.containsKey(new Square(x + 2, x + 2))) result.add(new Square(x + 2, x + 2)); //upper right
             } else if (board.get(dleft_di) == Mark.B) {
-                if (!board.containsKey(new Square(row - 2, row - 2))) result.add(new Square(row - 2, row - 2));
+                if (!board.containsKey(new Square(x - 2, x - 2))) result.add(new Square(x - 2, x - 2)); //lower left
             } else if (board.get(dright_di) == Mark.B) {
-                if (!board.containsKey(new Square(row + 2, row - 2))) result.add(new Square(row + 2, row - 2));
+                if (!board.containsKey(new Square(x + 2, x - 2))) result.add(new Square(x + 2, x - 2)); //lower right
             } else if (board.get(uleft_di) == Mark.B) {
-                if (!board.containsKey(new Square(row - 2, row + 2))) result.add(new Square(row - 2, row + 2));
+                if (!board.containsKey(new Square(x - 2, x + 2))) result.add(new Square(x - 2, x + 2)); //upper left
             }
 
         }
@@ -123,38 +124,44 @@ public class Checkers implements Game<Square> {
 
         System.out.println("  ");
         for (int col = 0; col < BOARD_SIZE; col++){
-            System.out.println(" " + col + " ");
+            System.out.print(" " + col + " ");
         }
         System.out.println();
         for (int i = 0; i < BOARD_SIZE; i++){
-            System.out.println(" " + i + " ");
+            System.out.print(" " + i + " ");
 
             for (int j = 0; j < BOARD_SIZE; j++){
                 Square square = new Square(i, j);
                 if (board.containsKey(square)){
                     if(board.get(square) == Mark.R){
-                        System.out.println(" " + RED + board.get(square) + RESET + " ");
+                        System.out.print(" " + RED + board.get(square) + RESET + " ");
                     }if(board.get(square) == Mark.B){
-                        System.out.println(" " + WHITE + board.get(square) + RESET + " ");
+                        System.out.print(" " + WHITE + board.get(square) + RESET + " ");
                     }
                 } else{
-                    System.out.println(" " +  " " + " ");
+                    System.out.print(" " +  " " + " ");
                 }if (j < BOARD_SIZE - 1){
-                    System.out.println("|");
+                    System.out.print("|");
                 }
             }
             System.out.println();
 
             if (i < BOARD_SIZE - 1){
-                System.out.println("   ");
+                System.out.print("   ");
                 for (int j = 0; j < BOARD_SIZE; j++){
-                    System.out.println("---");
+                    System.out.print("---");
                     if (j < BOARD_SIZE - 1){
-                        System.out.println("+");
+                        System.out.print("+");
                     }
                 }
                 System.out.println();
             }
         }
     }
+//    public static void main(String[] args){
+//        Checkers checkers = new Checkers(5);
+//        checkers.printBoard();
+//    }
 }
+
+
