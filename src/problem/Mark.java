@@ -9,5 +9,5 @@ package problem;
  * Note that, when comparing enum values in Java,
  * always use ==, not equals()
  */
-public enum Mark{R, B}
+public enum Mark{R, B, K}
 

@@ -1,19 +1,27 @@
 package problem;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A generic interface for turn-based games that can be used with minimax search.
  *
  * @param <A> the type representing a move or action in the game
  */
-public interface Game<A> {
+public interface Game<A, B> {
     /**
      * Returns a list of all legal moves that can be made from the current state.
      *
      * @return a list of remaining valid moves
      */
     List<A> getAllRemainingMoves();
+
+    /**
+     * Creates the board, should be used on initial execution
+     * @return void
+     */
+
+    void makeBoard();
 
     /**
      * Computes the utility of the current game state.

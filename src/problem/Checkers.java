@@ -2,7 +2,7 @@ package problem;
 
 import java.util.*;
 
-public class Checkers implements Game<Square> {
+public class Checkers implements Game<Square, Mark> {
 
     private final int BOARD_SIZE;
 
@@ -22,7 +22,6 @@ public class Checkers implements Game<Square> {
             return true;
         }
         //If no one won, game is a draw or unfinished
-
         return board.size() == BOARD_SIZE * BOARD_SIZE;
     }
 
@@ -30,11 +29,15 @@ public class Checkers implements Game<Square> {
         //This 'executes' the move by placing the mark on the board
         if (isMax) {
             //R is red, the Max move
-            board.put(move, Mark.R);
+            if (board.get(move) == Mark.R) {
+                board.put(move, Mark.R);
+            }
         }
         else{
             //B is black, the Min move
-            board.put(move, Mark.B);
+            if (board.get(move) == Mark.B) {
+                board.put(move, Mark.B);
+            }
         }
     }
 
@@ -44,36 +47,26 @@ public class Checkers implements Game<Square> {
     }
 
     public int utility(){
-        //Could try incorporating space jumps,
-        //and distance from other side
-
-        //This is where we do our checks
-        int dSum = 0; //Check diagonals, this shows how many diagonal conflicts
-        for (int i = 0; i < BOARD_SIZE; i++){
-            Integer hop = 0;
-            Square square = new Square(i, i);
-            //Make new square to check with
-            if (board.containsKey(square)){
-                //board should contain the new square unless it's out of bounds
-                if (board.get(square) == Mark.R) { //Distance from other side
-                    dSum = BOARD_SIZE - i + (dSum + 1);
-                }else {
-                    dSum = BOARD_SIZE - i + (dSum - 1);
-                }
-                if (board.get(new Square(i-1, i-1)) == Mark.B) {
-                    dSum++;
-                }
-                if (board.get(new Square(i+1, i+1)) == Mark.B){
-                    dSum++;
+        int red = 0; //AI is red piece
+        int black = 0; //Player is black piece
+        for (int row = 0; row < BOARD_SIZE; row++){
+            for (int col = 0; col< BOARD_SIZE; col++){
+                Square square = new Square(row, col);
+                if (board.containsKey(square)){
+                    if (board.get(square) == Mark.R){
+                        red++;
+                    }else if (board.get(square) == Mark.B){
+                        black++;
+                    }
                 }
             }
         }
-        if (dSum >= BOARD_SIZE){ //Max won
+        if (red == 1 && black == 0){
             return 1;
-        }else if (dSum <= -BOARD_SIZE){ //Min won
+        }else if (red == 0 && black == 1){
             return -1;
         }
-        return 0; //No one won
+        return 0;
     }
 
     public List<Square> getAllRemainingMoves() {
@@ -116,6 +109,51 @@ public class Checkers implements Game<Square> {
 
     //Checks if there is already a move there
     public boolean markedSquare(Square square){ return board.containsKey(square); }
+
+    public void makeBoard(){
+        //3x3, 1 occupied, 1 empty
+        //5x5, 2 occupied, 1 empty
+        //7x7, 3 occupied, 1 empty
+        //9x9, 3 occupied, 3 empty
+        //11x11 3 occupied, 5 empty
+        if (BOARD_SIZE == 3) { //3x3
+            for (int row = 0; row < BOARD_SIZE; row++) {
+                for (int col = 0; col < BOARD_SIZE; col++) {
+                    if ((row == 0) && ((col == 0) || (col == 2))){
+                        Square square = new Square(row, col);
+                        board.put(square, Mark.R);
+                    }else if((row == 2) && ((col == 0) || (col == 2))){
+                        Square square = new Square(row, col);
+                        board.put(square, Mark.B);
+                    }
+                }
+            }
+        }if (BOARD_SIZE == 5){ //5x5
+            for (int row = 1; row <= BOARD_SIZE; row++) {
+                for (int col = 1; col <= BOARD_SIZE; col++) {
+                    if ((row <= 2) && (col % 2 == 1) && (row % 2 == 1)) {
+                        Square square = new Square(row, col);
+                        board.put(square, Mark.R);
+                    }else if((row >= BOARD_SIZE - 2) && (col % 2 == 0) && (row % 2 == 0)){ //Occupies 2
+                        Square square = new Square(row, col);
+                        board.put(square, Mark.B);
+                    }
+                }
+            }
+        }else if (BOARD_SIZE >= 7){
+            for (int row = 1; row <= BOARD_SIZE; row++) {
+                for (int col = 1; col <= BOARD_SIZE; col++) {
+                    if ((row <= 3) && (col % 2 == 1) && (row % 2 == 1)){
+                        Square square = new Square(row, col);
+                        board.put(square, Mark.R);
+                    }else if((row >= BOARD_SIZE - 3) && (col % 2 == 1) && (row % 2 == 1)){
+                        Square square = new Square(row, col);
+                        board.put(square, Mark.B);
+                    }
+                }
+            }
+        }
+    }
 
     public void printBoard(){
         String RESET = "\u001B[0m";

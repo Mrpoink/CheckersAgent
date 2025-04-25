@@ -14,15 +14,15 @@ import java.util.List;
  *
  * @param <A> the type representing a move or action in the game
  */
-public class Minimax<A> {
-    protected final Game<A> game;
+public class Minimax<A, B> {
+    protected final Game<A, B> game;
 
     /**
      * Record to store the score of a game state and the path of moves leading to it.
      */
     public record ScoreMove<A> (int score, List<A> pathOfMoves){}
 
-    public Minimax(Game<A> game) {
+    public Minimax(Game<A, B> game) {
         this.game = game;
     }
 

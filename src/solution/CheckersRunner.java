@@ -8,9 +8,9 @@ import problem.Square;
 import problem.Checkers;
 import java.util.*;
 
-public class CheckersRunner extends Minimax<Square> {
+public class CheckersRunner extends Minimax<Square, Mark> {
 
-    private static final int BOARD_SIZE = 5;
+    private static final int BOARD_SIZE = 3;
 
     //Mark.R: AI
     //Mark.B: Human
@@ -24,6 +24,7 @@ public class CheckersRunner extends Minimax<Square> {
     }
 
     public void play(){
+        game.makeBoard();
         while (!game.isTerminal()){
             game.printBoard();
             System.out.println();
@@ -31,6 +32,7 @@ public class CheckersRunner extends Minimax<Square> {
                 game.execute(getUserMove(), true);
                 turn = Mark.R;
             }else{
+
                 System.out.println("AI turn: ");
                 game.execute(minimaxSearch(), false);
                 turn = Mark.B;
