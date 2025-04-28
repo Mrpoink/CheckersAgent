@@ -44,18 +44,21 @@ public class Minimax<A, B> {
      * @return best score and path of moves for the MAX player
      */
     public ScoreMove<A> max(Integer alpha, Integer beta){
+        System.out.println("Max: " + game.utility());
         List<A> bestPath = new ArrayList<>();
         if(game.isTerminal()){
-            return new ScoreMove<>(game.utility(),new ArrayList<>());
+            return new ScoreMove<>(game.utility(),new ArrayList<>(bestPath));
         }else{
             int bestScore = Integer.MIN_VALUE;
 
-            for(A move : game.getAllRemainingMoves()){
+            for(A move : game.getAllRemainingMoves(game.getBoard())){
+                System.out.println(": " + move);
                 game.execute(move, true);
                 ScoreMove<A> a = min(alpha, beta);
+                System.out.println(a.pathOfMoves());
                 game.undo(move, true);
                 if (a.score() >= beta){
-                    return new ScoreMove<>(a.score(), null);
+                    return new ScoreMove<>(a.score(), a.pathOfMoves());
                 }
                 else if (a.score() > alpha){
                     alpha = a.score();
@@ -73,17 +76,19 @@ public class Minimax<A, B> {
      * @return best score and path of moves for the MIN player
      */
     public ScoreMove<A> min(Integer alpha, Integer beta){
+        System.out.println("Min: " + game.utility());
         List<A> bestPath = new ArrayList<>();
         if(game.isTerminal()){
-            return new ScoreMove<>(game.utility(), new ArrayList<>());
+            return new ScoreMove<>(game.utility(), new ArrayList<>(bestPath));
         }else {
             int bestScore = Integer.MAX_VALUE;
-            for (A move : game.getAllRemainingMoves()) {
+            for (A move : game.getAllRemainingMoves(game.getBoard())) {
                 game.execute(move, false);
                 ScoreMove<A> b = max(alpha, beta);
+                System.out.println(b.score());
                 game.undo(move, false);
                 if (b.score() <= alpha){
-                    return new ScoreMove<>(b.score(), null);
+                    return new ScoreMove<>(b.score(), b.pathOfMoves());
                 }
                 else if (b.score() < beta) {
                     beta = b.score();

@@ -89,9 +89,9 @@ public class CheckersRunner extends Minimax<Square, Mark> {
 
     private void announceWinner(int utility){
         if (utility == 1){
-            System.out.println("\nPlayer (B) wins!!");
+            System.out.println("\nPlayer (R) wins!!");
         }else if(utility == -1){
-            System.out.println("\nAI (R) wins!!");
+            System.out.println("\nAI (B) wins!!");
         }else{
             System.out.println("Its a draw!!");
         }

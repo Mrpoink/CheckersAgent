@@ -14,7 +14,7 @@ public interface Game<A, B> {
      *
      * @return a list of remaining valid moves
      */
-    List<A> getAllRemainingMoves();
+    List<A> getAllRemainingMoves(Map<Square, Mark> currentBoard);
 
     /**
      * Creates the board, should be used on initial execution
@@ -22,6 +22,8 @@ public interface Game<A, B> {
      */
 
     void makeBoard();
+
+    Map<Square, Mark> getBoard();
 
     /**
      * Computes the utility of the current game state.
