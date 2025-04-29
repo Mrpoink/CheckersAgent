@@ -26,7 +26,7 @@ public class CheckersRunner extends Minimax<Square, Mark> {
     public void play(){
         game.makeBoard();
         while (!game.isTerminal()){
-            game.printBoard();
+            game.printBoard(game.board);
             System.out.println();
             if(turn == Mark.B){
                 game.execute(getUserMove(), true);
@@ -38,7 +38,7 @@ public class CheckersRunner extends Minimax<Square, Mark> {
                 turn = Mark.B;
             }
         }
-        game.printBoard();
+        game.printBoard(game.board);
         announceWinner(game.utility());
     }
 

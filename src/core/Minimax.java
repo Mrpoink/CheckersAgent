@@ -50,7 +50,7 @@ public class Minimax<A, B> {
         List<Checkers.Moves<Square, Square>> bestPath = new ArrayList<>();
         if(game.isTerminal()){
             //Add best
-            return new ScoreMove<>(game.utility(),null);
+            return new ScoreMove<>(game.utility(),bestPath);
         }else{
             int bestScore = Integer.MIN_VALUE;
 
@@ -82,7 +82,7 @@ public class Minimax<A, B> {
         System.out.println("Min: " + game.utility());
         List<Checkers.Moves<Square, Square>> bestPath = new ArrayList<>();
         if(game.isTerminal()){
-            return new ScoreMove<>(game.utility(), null);
+            return new ScoreMove<>(game.utility(), bestPath);
         }else {
             int bestScore = Integer.MAX_VALUE;
             for (Checkers.Moves<Square, Square> move : game.getAllRemainingMoves(game.getBoard())) {
