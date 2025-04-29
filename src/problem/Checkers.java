@@ -2,7 +2,7 @@ package problem;
 
 import java.util.*;
 
-public class Checkers implements Game<Square, Mark> {
+public class Checkers implements Game<Checkers.Moves<Square, Square>, Mark> {
 
     private final int BOARD_SIZE;
 
@@ -12,6 +12,8 @@ public class Checkers implements Game<Square, Mark> {
         this.BOARD_SIZE = size;
         this.board = new HashMap<>();
     }
+
+    public record Moves<A, B> (Square from, Square to){}
 
     public Map<Square, Mark> getBoard(){
         return this.board;
@@ -29,21 +31,29 @@ public class Checkers implements Game<Square, Mark> {
         return board.size() == BOARD_SIZE * BOARD_SIZE;
     }
 
-    public void execute(Square move, boolean isMax){
+    public void execute(Moves<Square, Square> move, boolean isMax){
         //This 'executes' the move by placing the mark on the board
         if (isMax) {
             //R is red, the Max move
-            board.put(move, Mark.R);
+            board.put(move.to(), Mark.R);
+            board.remove(move.from());
         }
         else{
             //B is black, the Min move
-            board.put(move, Mark.R);
+            board.put(move.to(), Mark.B);
+            board.remove(move.from());
         }
     }
 
-    public void undo(Square move, boolean isMax){
+    public void undo(Moves<Square,Square> move, boolean isMax){
         //Removes move from map
-        board.remove(move);
+        if (isMax) {
+            board.remove(move.to());
+            board.put(move.from(), Mark.R);
+            return;
+        }
+        board.remove(move.to());
+        board.put(move.from(), Mark.B);
     }
 
     public int utility(){
@@ -73,11 +83,11 @@ public class Checkers implements Game<Square, Mark> {
         return (upperbound >= number1 && lowerbound <= number1) && (number2 >= lowerbound && number2 <= upperbound);
     }
 
-    public List<Square> getAllRemainingMoves(Map<Square, Mark> currentBoard) {
+    public List<Moves<Square, Square>> getAllRemainingMoves(Map<Square, Mark> currentBoard) {
         //Only remaining moves can be in diagonals
         //Going to have to include bit where it limits the amount of rows
         //Needs to return moves
-        List<Square> result = new ArrayList<>();
+        List<Moves<Square, Square>> result = new ArrayList<>();
         for (int y = 0; y < BOARD_SIZE; y++) {
             for (int x = 0; x < BOARD_SIZE; x++) {
                 Square square = new Square(y, x);
@@ -88,8 +98,17 @@ public class Checkers implements Game<Square, Mark> {
                     int walkY = y - 1;
                     int walkX = x + 1;
 
-                    if (inRange(jumpY, jumpX, BOARD_SIZE, 0)){
+                    if (inRange(jumpY, jumpX, BOARD_SIZE, 0) && inRange(walkY, walkX, BOARD_SIZE, 0)){
 
+                        Square jumped = new Square(jumpY, jumpX);
+                        Square walked = new Square(walkY, walkX);
+
+                        if (!currentBoard.containsKey(jumped) && ((currentBoard.get(walked) == Mark.R)&&(currentBoard.get(jumped) != Mark.R))){
+                            result.add(new Moves<>(square, jumped));
+                        }
+                        if (!currentBoard.containsKey(walked) && !(currentBoard.get(walked) == Mark.R)){
+                            result.add(new Moves<>(square, walked));
+                        }
                     }
                 }
 

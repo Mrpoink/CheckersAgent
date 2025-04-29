@@ -42,7 +42,7 @@ public class CheckersRunner extends Minimax<Square, Mark> {
         announceWinner(game.utility());
     }
 
-    private Square getUserMove(){
+    private Checkers.Moves<Square,Square> getUserMove(){
         int row=-1, col=-1, grab_row=-1, grab_col=-1;
         boolean validInput = false;
         Scanner scan = new Scanner(System.in);
@@ -79,7 +79,7 @@ public class CheckersRunner extends Minimax<Square, Mark> {
                 System.out.println("Invalid please try again");
             }
         }
-        return new Square(row, col);
+        return new Checkers.Moves<>(new Square(grab_row, grab_col), new Square(row, col));
     }
 
     private boolean isValidMove(int row, int col){
