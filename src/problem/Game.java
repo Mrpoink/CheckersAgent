@@ -31,14 +31,14 @@ public interface Game<A, B> {
      *
      * @return an integer utility value: higher means better for the MAX player
      */
-    int utility();
+    int utility(Map<Square,Mark> currentBoard);
 
     /**
      * Checks whether the game is over.
      *
      * @return true if the current state is terminal; false otherwise
      */
-    boolean isTerminal();
+    boolean isTerminal(Map<Square,Mark> currentBoard);
 
     /**
      * Applies the given move to the current game state.

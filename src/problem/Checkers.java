@@ -19,9 +19,9 @@ public class Checkers implements Game<Checkers.Moves<Square, Square>, Mark> {
         return this.board;
     }
 
-    public boolean isTerminal(){
+    public boolean isTerminal(Map<Square,Mark> currentBoard){
         //Check utility
-        int utility = utility();
+        int utility = utility(currentBoard);
 
         if (utility == 1 || utility == -1){
             //If someone has won, return true
@@ -33,23 +33,24 @@ public class Checkers implements Game<Checkers.Moves<Square, Square>, Mark> {
 
     public void execute(Moves<Square, Square> move, boolean isMax){
         //This 'executes' the move by placing the mark on the board
-        System.out.println("Checking: " + move.to() + ", " + move.from());
+        System.out.println("Checking: " + move.from() + ", " + move.to());
         if (isMax) {
-            //R is red, the Max move
-            board.put(move.to(), Mark.R);
-            System.out.println("R: " + move.to() + ", " + move.from());
-            System.out.println("Board before: " + board);
-            board.remove(move.to());
-            System.out.println("Board after: " + board);
-        }
-        else{
-            //B is black, the Min move
+            //B is black, the Max move
             board.put(move.to(), Mark.B);
-            System.out.println("B: " + move.to() + ", " + move.from());
+            System.out.println("B: " + move.from() + ", " + move.to());
             System.out.println("Board before: " + board);
             board.remove(move.from());
             System.out.println("Board after: " + board);
         }
+        else{
+            //R is red, the Min move
+            board.put(move.to(), Mark.R);
+            System.out.println("R: " + move.from() + ", " + move.to());
+            System.out.println("Board before: " + board);
+            board.remove(move.from());
+            System.out.println("Board after: " + board);
+        }
+        printBoard(board);
     }
 
     public void undo(Moves<Square,Square> move, boolean isMax){
@@ -63,25 +64,26 @@ public class Checkers implements Game<Checkers.Moves<Square, Square>, Mark> {
         board.put(move.from(), Mark.B);
     }
 
-    public int utility(){
+    public int utility(Map<Square,Mark> currentBoard){
         int red = 0; //AI is red piece
         int black = 0; //Player is black piece
         for (int row = 0; row < BOARD_SIZE; row++){
             for (int col = 0; col< BOARD_SIZE; col++){
                 Square square = new Square(row, col);
-                if (board.containsKey(square)){
+                if (currentBoard.containsKey(square)){
                     if (board.get(square) == Mark.R){
-                        red++;
-                    }else if (board.get(square) == Mark.B){
-                        black++;
+                        red = red + Math.abs(row-BOARD_SIZE);
+                    }
+                    if (currentBoard.get(square) == Mark.B){
+                        black = black + Math.abs(BOARD_SIZE - row);
                     }
                 }
             }
         }
-        if (red == 1 && black == 0){
-            return 1;
-        }else if (red == 0 && black == 1){
-            return -1;
+        if (red > black){
+            return red;
+        }else if (red < black){
+            return black;
         }
         return 0;
     }
@@ -104,10 +106,12 @@ public class Checkers implements Game<Checkers.Moves<Square, Square>, Mark> {
         List<Moves<Square, Square>> result = new ArrayList<>();
         if (inRange(jumpY, jumpX, BOARD_SIZE, 0)) {
 
+
             Square jumped = new Square(jumpY, jumpX);
             Square over = new Square(walkY, walkX);
 
-            if (!currentBoard.containsKey(jumped) && ((currentBoard.get(over) == enemy) && (currentBoard.get(jumped) != player))) {
+            if (currentBoard.containsKey(jumped) && (currentBoard.get(over) == enemy) ) {
+                System.out.println("Found jump");
                 result.add(new Moves<>(square, jumped));
             }
         }
@@ -133,10 +137,10 @@ public class Checkers implements Game<Checkers.Moves<Square, Square>, Mark> {
                 if (currentBoard.get(square) == Mark.R){
 
                     int jumpY = y + 2; int jumpX = x - 2; int walkY = y + 1; int walkX = x - 1;//lower left
-                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.R));
+                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.B));
 
                     jumpY = y + 2; jumpX = x + 2; walkY = y + 1; walkX = x + 1;//lower right
-                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.R));
+                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.B));
 //
 //                    jumpY = y - 2; jumpX = x - 2; walkY = y + 1; walkX = x - 1;//upper left,                  R can't go up
 //                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.R));
@@ -153,10 +157,10 @@ public class Checkers implements Game<Checkers.Moves<Square, Square>, Mark> {
 //                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.B));
 
                     int jumpY = y - 2; int jumpX = x - 2; int walkY = y + 1; int walkX = x - 1;//upper left
-                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.B));
+                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.R));
 
                     jumpY = y - 2; jumpX = x + 2; walkY = y + 1; walkX = x + 1;//upper right
-                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.B));
+                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.R));
 
                 }
 

@@ -37,7 +37,7 @@ public class Minimax<A, B> {
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
         ScoreMove<A> b = min(alpha, beta);
-        return b.pathOfMoves().get(0);
+        return b.pathOfMoves().getFirst();
     }
 
     /**
@@ -46,11 +46,11 @@ public class Minimax<A, B> {
      * @return best score and path of moves for the MAX player
      */
     public ScoreMove<A> max(Integer alpha, Integer beta){
-        System.out.println("Max: " + game.utility());
+        System.out.println("Max: " + game.utility(game.board));
         List<Checkers.Moves<Square, Square>> bestPath = new ArrayList<>();
-        if(game.isTerminal()){
+        if(game.isTerminal(game.board)){
             //Add best
-            return new ScoreMove<>(game.utility(),bestPath);
+            return new ScoreMove<>(game.utility(game.board),bestPath);
         }else{
             int bestScore = Integer.MIN_VALUE;
 
@@ -58,7 +58,7 @@ public class Minimax<A, B> {
                 System.out.println(": " + move);
                 game.execute(move, true);
                 ScoreMove<A> a = min(alpha, beta);
-                System.out.println(a.pathOfMoves());
+                System.out.println("path: " + a.pathOfMoves());
                 game.undo(move, true);
                 if (a.score() >= beta){
                     return new ScoreMove<>(a.score(), a.pathOfMoves());
@@ -79,16 +79,17 @@ public class Minimax<A, B> {
      * @return best score and path of moves for the MIN player
      */
     public ScoreMove<A> min(Integer alpha, Integer beta){
-        System.out.println("Min: " + game.utility());
+        System.out.println("Min: " + game.utility(game.board));
         List<Checkers.Moves<Square, Square>> bestPath = new ArrayList<>();
-        if(game.isTerminal()){
-            return new ScoreMove<>(game.utility(), bestPath);
+        if(game.isTerminal(game.board)){
+            return new ScoreMove<>(game.utility(game.board), bestPath);
         }else {
             int bestScore = Integer.MAX_VALUE;
             for (Checkers.Moves<Square, Square> move : game.getAllRemainingMoves(game.getBoard())) {
+                System.out.println(": " + move);
                 game.execute(move, false);
                 ScoreMove<A> b = max(alpha, beta);
-                System.out.println(b.score());
+                System.out.println("b score: " +b.score());
                 game.undo(move, false);
                 if (b.score() <= alpha){
                     return new ScoreMove<>(b.score(), b.pathOfMoves());
