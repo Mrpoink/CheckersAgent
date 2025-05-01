@@ -32,13 +32,13 @@ public class Minimax<A, B> {
     /**
      * Performs a minimax search and returns the best move for the current player.
      *
-     * @return the first move on the path to the best outcome for the MIN player (i.e., AI)
+     * @return the first move on the path to the best outcome for the MAX player (i.e., AI)
      */
     public Checkers.Moves<Square, Square, Square> minimaxSearch(){
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
-        ScoreMove<A> b = min(alpha, beta);
-        return b.pathOfMoves().getFirst();
+        ScoreMove<A> a = max(alpha, beta);
+        return a.pathOfMoves().getFirst();
     }
 
     /**
