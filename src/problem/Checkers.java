@@ -19,7 +19,7 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
         return this.board;
     }
 
-    public boolean isTerminal(Map<Square,Mark> currentBoard){
+    public boolean isTerminal(Map<Square,Mark> currentBoard, Mark currentMark){
         //Check utility
         boolean redLeft = currentBoard.containsValue(Mark.R);
         boolean blackLeft = currentBoard.containsValue(Mark.B);
@@ -27,7 +27,7 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
         if (!redLeft || !blackLeft){
             return true;
         }
-        if (getAllRemainingMoves(currentBoard).isEmpty()){
+        if (getAllRemainingMoves(currentBoard, currentMark).isEmpty()){
             return true;
         }
         return false;
@@ -49,9 +49,6 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
             System.out.println("Board before: " + board);
             board.put(move.to(), currentMark);
             System.out.println("Board after: " + board);
-
-            board.remove(move.from());
-            board.put(move.to(), Mark.B);
         }
         else{
             //Walk
@@ -67,15 +64,19 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
     public void undo(Moves<Square,Square, Square> move, boolean isMax){
         //Removes move from map
         Mark currentMark;
+        Mark enemyMark;
         if (isMax){
             currentMark = Mark.B;
+            enemyMark = Mark.R;
         }else{
             currentMark = Mark.R;
+            enemyMark = Mark.B;
         }
         if (move.jump != null) {
             board.remove(move.to());
             board.remove(move.jump());
             board.put(move.from(), currentMark);
+            board.put(move.jump(), enemyMark);
             return;
         }
         board.remove(move.to());
@@ -128,10 +129,8 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
             boolean Check3 = ((currentBoard.get(walked) != enemy) && (currentBoard.get(walked) != player));
             boolean Check4 = (!currentBoard.containsKey(walked));
 
-            if (Check3) {
-                if (Check4) {
-                    result.add(new Moves<>(square, walked, null));
-                }
+            if (Check4) {
+                result.add(new Moves<>(square, walked, null));
             }
         }
         return result;
@@ -155,7 +154,7 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
             Square jumped = new Square(jumpY, jumpX);
 
             System.out.println(jumped + " in jump");
-            Square over = new Square(jumpY - 1, jumpX - 1);
+            Square over = new Square(((square.row() + jumpY) / 2), ((square.column() + jumpX) / 2));
             System.out.println(over + " in over");
 
             System.out.println("Check 1: " + jumped + " " + over + " " + (!currentBoard.containsKey(jumped)));
@@ -173,7 +172,7 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
     }
 
 
-    public List<Moves<Square, Square, Square>> getAllRemainingMoves(Map<Square, Mark> currentBoard) {
+    public List<Moves<Square, Square, Square>> getAllRemainingMoves(Map<Square, Mark> currentBoard, Mark currentMark) {
         //Only remaining moves can be in diagonals
         //Going to have to include bit where it limits the amount of rows
         //Needs to return moves
@@ -185,24 +184,26 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
             for (int x = 0; x < BOARD_SIZE; x++) {
                 Square square = new Square(y, x);
 
+                if (currentBoard.get(square) ==currentMark) {
+                    if (currentMark == Mark.R) {
 
-                if (currentBoard.containsKey(square) && currentBoard.get(square) == Mark.R){
+                        Square square1 = new Square(y, x);
+                        System.out.println("Red found" + " " + square1);
 
-                    Square square1 = new Square(y, x);
-                    System.out.println("Red found" + " " + square1);
+                        int jumpY = y + 2;
+                        int jumpX = x - 2;
+                        int walkY = y + 1;
+                        int walkX = x - 1;//lower left
+                        jumps.addAll(jumpCheck(square1, jumpX, jumpY, currentBoard, Mark.R));
+                        walks.addAll(walkCheck(square1, walkX, walkY, currentBoard, Mark.R));
 
-                    int jumpY = y + 2; int jumpX = x - 2; int walkY = y + 1; int walkX = x - 1;//lower left
-                    jumps.addAll(jumpCheck(square1, jumpX, jumpY, currentBoard, Mark.R));
-                    walks.addAll(walkCheck(square1, walkX, walkY, currentBoard, Mark.R));
+                        jumpY = y + 2;
+                        jumpX = x + 2;
+                        walkY = y + 1;
+                        walkX = x + 1;//lower right
+                        jumps.addAll(jumpCheck(square1, jumpX, jumpY, currentBoard, Mark.R));
+                        walks.addAll(walkCheck(square1, walkX, walkY, currentBoard, Mark.R));
 
-                    jumpY = y + 2; jumpX = x + 2; walkY = y + 1; walkX = x + 1;//lower right
-                    jumps.addAll(jumpCheck(square1, jumpX, jumpY, currentBoard, Mark.R));
-                    walks.addAll(walkCheck(square1, walkX, walkY, currentBoard, Mark.R));
-
-                    result.addAll(walks);
-                    result.addAll(jumps);
-                    System.out.println("Result: " + result);
-                    return result;
 //
 //                    jumpY = y - 2; jumpX = x - 2; walkY = y + 1; walkX = x - 1;//upper left,                  R can't go up
 //                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.R));
@@ -210,34 +211,40 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
 //                    jumpY = y - 2; jumpX = x + 2; walkY = y + 1; walkX = x + 1;//upper right
 //                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.R));
 
-                }
-                if (currentBoard.containsKey(square) && currentBoard.get(square) == Mark.B){
-                    Square square2 = new Square(y, x);
-                    System.out.println("Black found" + " " + square2);
+                    } else {
+                        Square square2 = new Square(y, x);
+                        System.out.println("Black found" + " " + square2);
 //                    int jumpY = y + 2; int jumpX = x - 2; int walkY = y + 1; int walkX = x - 1;//lower left,   B cant go down
 //                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.B));
 //
 //                    jumpY = y + 2; jumpX = x + 2; walkY = y + 1; walkX = x + 1;//lower right
 //                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.B));
 
-                    int jumpY = y - 2; int jumpX = x - 2; int walkY = y - 1; int walkX = x - 1;//upper left
-                    jumps.addAll(jumpCheck(square2, jumpX, jumpY, currentBoard, Mark.B));
-                    walks.addAll(walkCheck(square2, walkX, walkY, currentBoard, Mark.B));
+                        int jumpY = y - 2;
+                        int jumpX = x - 2;
+                        int walkY = y - 1;
+                        int walkX = x - 1;//upper left
+                        jumps.addAll(jumpCheck(square2, jumpX, jumpY, currentBoard, Mark.B));
+                        walks.addAll(walkCheck(square2, walkX, walkY, currentBoard, Mark.B));
 
-                    jumpY = y - 2; jumpX = x + 2; walkY = y - 1; walkX = x + 1;//upper right
-                    jumps.addAll(jumpCheck(square2, jumpX, jumpY, currentBoard, Mark.R));
-                    walks.addAll(walkCheck(square2, walkX, walkY, currentBoard, Mark.R));
+                        jumpY = y - 2;
+                        jumpX = x + 2;
+                        walkY = y - 1;
+                        walkX = x + 1;//upper right
+                        jumps.addAll(jumpCheck(square2, jumpX, jumpY, currentBoard, Mark.B));
+                        walks.addAll(walkCheck(square2, walkX, walkY, currentBoard, Mark.B));
 
-                    result.addAll(walks);
-                    result.addAll(jumps);
-                    System.out.println("Result: " + result);
-                    return result;
 
+                    }
                 }
 
             }
+        }if (!jumps.isEmpty()){
+            return jumps;
         }
-        return result;
+        else{
+            return walks;
+        }
     }
 
     //Checks if there is already a move there

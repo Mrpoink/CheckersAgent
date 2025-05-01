@@ -14,7 +14,7 @@ public interface Game<A, B> {
      *
      * @return a list of remaining valid moves
      */
-    List<Checkers.Moves<Square, Square, Square>> getAllRemainingMoves(Map<Square, Mark> currentBoard);
+    List<Checkers.Moves<Square, Square, Square>> getAllRemainingMoves(Map<Square, Mark> currentBoard, Mark currentMark);
 
     /**
      * Creates the board, should be used on initial execution
@@ -38,7 +38,7 @@ public interface Game<A, B> {
      *
      * @return true if the current state is terminal; false otherwise
      */
-    boolean isTerminal(Map<Square,Mark> currentBoard);
+    boolean isTerminal(Map<Square,Mark> currentBoard, Mark currentMark);
 
     /**
      * Applies the given move to the current game state.

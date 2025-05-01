@@ -2,6 +2,7 @@ package core;
 
 import problem.Checkers;
 import problem.Game;
+import problem.Mark;
 import problem.Square;
 
 import java.util.ArrayList;
@@ -46,15 +47,16 @@ public class Minimax<A, B> {
      * @return best score and path of moves for the MAX player
      */
     public ScoreMove<A> max(Integer alpha, Integer beta){
+        Mark currentMark = Mark.B;
         System.out.println("Max: " + game.utility(game.board));
         List<Checkers.Moves<Square, Square, Square>> bestPath = new ArrayList<>();
-        if(game.isTerminal(game.board)){
+        if(game.isTerminal(game.board, currentMark)){
             //Add best
             return new ScoreMove<>(game.utility(game.board),bestPath);
         }else{
             int bestScore = Integer.MIN_VALUE;
 
-            for(Checkers.Moves<Square, Square, Square> move : game.getAllRemainingMoves(game.getBoard())){
+            for(Checkers.Moves<Square, Square, Square> move : game.getAllRemainingMoves(game.getBoard(), currentMark)){
                 System.out.println(": " + move);
                 game.execute(move, true);
                 ScoreMove<A> a = min(alpha, beta);
@@ -79,13 +81,14 @@ public class Minimax<A, B> {
      * @return best score and path of moves for the MIN player
      */
     public ScoreMove<A> min(Integer alpha, Integer beta){
+        Mark currentMark = Mark.R;
         System.out.println("Min: " + game.utility(game.board));
         List<Checkers.Moves<Square, Square, Square>> bestPath = new ArrayList<>();
-        if(game.isTerminal(game.board)){
+        if(game.isTerminal(game.board, currentMark)){
             return new ScoreMove<>(game.utility(game.board), bestPath);
         }else {
             int bestScore = Integer.MAX_VALUE;
-            for (Checkers.Moves<Square, Square, Square> move : game.getAllRemainingMoves(game.getBoard())) {
+            for (Checkers.Moves<Square, Square, Square> move : game.getAllRemainingMoves(game.getBoard(), currentMark)) {
                 System.out.println(": " + move);
                 game.execute(move, false);
                 ScoreMove<A> b = max(alpha, beta);
