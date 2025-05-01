@@ -198,6 +198,11 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
                     jumpY = y + 2; jumpX = x + 2; walkY = y + 1; walkX = x + 1;//lower right
                     jumps.addAll(jumpCheck(square1, jumpX, jumpY, currentBoard, Mark.R));
                     walks.addAll(walkCheck(square1, walkX, walkY, currentBoard, Mark.R));
+
+                    result.addAll(walks);
+                    result.addAll(jumps);
+                    System.out.println("Result: " + result);
+                    return result;
 //
 //                    jumpY = y - 2; jumpX = x - 2; walkY = y + 1; walkX = x - 1;//upper left,                  R can't go up
 //                    result.addAll(jumpWalkCheck(square, jumpY, jumpX, walkY, walkX, currentBoard, Mark.R));
@@ -223,14 +228,15 @@ public class Checkers implements Game<Checkers.Moves<Square, Square, Square>, Ma
                     jumps.addAll(jumpCheck(square2, jumpX, jumpY, currentBoard, Mark.R));
                     walks.addAll(walkCheck(square2, walkX, walkY, currentBoard, Mark.R));
 
+                    result.addAll(walks);
+                    result.addAll(jumps);
+                    System.out.println("Result: " + result);
+                    return result;
+
                 }
 
             }
         }
-
-        result.addAll(walks);
-        result.addAll(jumps);
-        System.out.println("Result: " + result);
         return result;
     }
 
