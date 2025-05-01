@@ -10,7 +10,7 @@ import java.util.*;
 
 public class CheckersRunner extends Minimax<Square, Mark> {
 
-    private static final int BOARD_SIZE = 3;
+    private static final int BOARD_SIZE = 5;
 
     //Mark.R: AI
     //Mark.B: Human
