@@ -47,21 +47,21 @@ public class Minimax<A, B> {
      * @return best score and path of moves for the MAX player
      */
     public ScoreMove<A> max(Integer alpha, Integer beta){
-        Mark currentMark = Mark.B;
-        System.out.println("Max: " + game.utility(game.board));
-        List<Checkers.Moves<Square, Square, Square>> bestPath = new ArrayList<>();
+        Mark currentMark = Mark.B; //Max is black in it's own head
+
+        List<Checkers.Moves<Square, Square, Square>> bestPath = new ArrayList<>(); //Best path is a path of MOVES
+
         if(game.isTerminal(game.board, currentMark)){
             //Add best
             return new ScoreMove<>(game.utility(game.board),bestPath);
         }else{
-            int bestScore = Integer.MIN_VALUE;
 
             for(Checkers.Moves<Square, Square, Square> move : game.getAllRemainingMoves(game.getBoard(), currentMark)){
-                //System.out.println(": " + move);
+
                 game.execute(move, true);
                 ScoreMove<A> a = min(alpha, beta);
-                //System.out.println("path: " + a.pathOfMoves());
                 game.undo(move, true);
+
                 if (a.score() >= beta){
                     return new ScoreMove<>(a.score(), a.pathOfMoves());
                 }
@@ -81,19 +81,20 @@ public class Minimax<A, B> {
      * @return best score and path of moves for the MIN player
      */
     public ScoreMove<A> min(Integer alpha, Integer beta){
-        Mark currentMark = Mark.R;
-        System.out.println("Min: " + game.utility(game.board));
-        List<Checkers.Moves<Square, Square, Square>> bestPath = new ArrayList<>();
+        Mark currentMark = Mark.R; //Min is red in it's own head
+
+        List<Checkers.Moves<Square, Square, Square>> bestPath = new ArrayList<>();//Best path is a path of MOVES
+
         if(game.isTerminal(game.board, currentMark)){
             return new ScoreMove<>(game.utility(game.board), bestPath);
         }else {
-            int bestScore = Integer.MAX_VALUE;
+
             for (Checkers.Moves<Square, Square, Square> move : game.getAllRemainingMoves(game.getBoard(), currentMark)) {
-                //System.out.println(": " + move);
+
                 game.execute(move, false);
                 ScoreMove<A> b = max(alpha, beta);
-                //System.out.println("b score: " +b.score());
                 game.undo(move, false);
+
                 if (b.score() <= alpha){
                     return new ScoreMove<>(b.score(), b.pathOfMoves());
                 }

@@ -24,16 +24,18 @@ public class CheckersRunner extends Minimax<Square, Mark> {
     }
 
     public void play(){
-        game.makeBoard();
-        while (!game.isTerminal(game.board, turn)){
-            game.printBoard(game.board);
+        game.makeBoard(); //Must call this because our board isn't created with the game
+
+        while (!game.isTerminal(game.board, turn)){ //Stops is isterminal
+
+            game.printBoard(game.board); //I wanna see it!!
             System.out.println();
             if(turn == Mark.B){
-                game.execute(getUserMove(), true);
+                game.execute(getUserMove(), true); //Black
                 turn = Mark.R;
             }else{
                 System.out.println("AI turn: ");
-                game.execute(minimaxSearch(), false);
+                game.execute(minimaxSearch(), false); //Red
                 turn = Mark.B;
             }
         }
@@ -84,8 +86,14 @@ public class CheckersRunner extends Minimax<Square, Mark> {
     }
 
     private Checkers.Moves<Square, Square, Square> isValidMove(int frow, int fcol, int trow, int tcol){
+        //From row, From column, To row, To column
+
         List<Checkers.Moves<Square, Square, Square>> validMoves = game.getAllRemainingMoves(game.board, Mark.B);
+        //Returns possible moves for player
+        //I worked really hard on this so let me use it where i can >:(
+
         for (Checkers.Moves<Square, Square, Square> move : validMoves){
+            //Checks if the player move exists in possible moves
             if ((new Square(frow, fcol)).equals(move.from()) && (new Square(trow, tcol)).equals(move.to())){
                 return move;
             }
