@@ -57,10 +57,10 @@ public class Minimax<A, B> {
             int bestScore = Integer.MIN_VALUE;
 
             for(Checkers.Moves<Square, Square, Square> move : game.getAllRemainingMoves(game.getBoard(), currentMark)){
-                System.out.println(": " + move);
+                //System.out.println(": " + move);
                 game.execute(move, true);
                 ScoreMove<A> a = min(alpha, beta);
-                System.out.println("path: " + a.pathOfMoves());
+                //System.out.println("path: " + a.pathOfMoves());
                 game.undo(move, true);
                 if (a.score() >= beta){
                     return new ScoreMove<>(a.score(), a.pathOfMoves());
@@ -89,10 +89,10 @@ public class Minimax<A, B> {
         }else {
             int bestScore = Integer.MAX_VALUE;
             for (Checkers.Moves<Square, Square, Square> move : game.getAllRemainingMoves(game.getBoard(), currentMark)) {
-                System.out.println(": " + move);
+                //System.out.println(": " + move);
                 game.execute(move, false);
                 ScoreMove<A> b = max(alpha, beta);
-                System.out.println("b score: " +b.score());
+                //System.out.println("b score: " +b.score());
                 game.undo(move, false);
                 if (b.score() <= alpha){
                     return new ScoreMove<>(b.score(), b.pathOfMoves());
