@@ -22,7 +22,7 @@ public class Minimax<A, B> {
     /**
      * Record to store the score of a game state and the path of moves leading to it.
      */
-    public record ScoreMove<A> (int score, List<Checkers.Moves<Square,Square>> pathOfMoves){}
+    public record ScoreMove<A> (int score, List<Checkers.Moves<Square,Square, Square>> pathOfMoves){}
 
     public Minimax(Checkers game) {
         this.game = game;
@@ -33,7 +33,7 @@ public class Minimax<A, B> {
      *
      * @return the first move on the path to the best outcome for the MIN player (i.e., AI)
      */
-    public Checkers.Moves<Square, Square> minimaxSearch(){
+    public Checkers.Moves<Square, Square, Square> minimaxSearch(){
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
         ScoreMove<A> b = min(alpha, beta);
@@ -47,14 +47,14 @@ public class Minimax<A, B> {
      */
     public ScoreMove<A> max(Integer alpha, Integer beta){
         System.out.println("Max: " + game.utility(game.board));
-        List<Checkers.Moves<Square, Square>> bestPath = new ArrayList<>();
+        List<Checkers.Moves<Square, Square, Square>> bestPath = new ArrayList<>();
         if(game.isTerminal(game.board)){
             //Add best
             return new ScoreMove<>(game.utility(game.board),bestPath);
         }else{
             int bestScore = Integer.MIN_VALUE;
 
-            for(Checkers.Moves<Square, Square> move : game.getAllRemainingMoves(game.getBoard())){
+            for(Checkers.Moves<Square, Square, Square> move : game.getAllRemainingMoves(game.getBoard())){
                 System.out.println(": " + move);
                 game.execute(move, true);
                 ScoreMove<A> a = min(alpha, beta);
@@ -80,12 +80,12 @@ public class Minimax<A, B> {
      */
     public ScoreMove<A> min(Integer alpha, Integer beta){
         System.out.println("Min: " + game.utility(game.board));
-        List<Checkers.Moves<Square, Square>> bestPath = new ArrayList<>();
+        List<Checkers.Moves<Square, Square, Square>> bestPath = new ArrayList<>();
         if(game.isTerminal(game.board)){
             return new ScoreMove<>(game.utility(game.board), bestPath);
         }else {
             int bestScore = Integer.MAX_VALUE;
-            for (Checkers.Moves<Square, Square> move : game.getAllRemainingMoves(game.getBoard())) {
+            for (Checkers.Moves<Square, Square, Square> move : game.getAllRemainingMoves(game.getBoard())) {
                 System.out.println(": " + move);
                 game.execute(move, false);
                 ScoreMove<A> b = max(alpha, beta);

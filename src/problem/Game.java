@@ -14,7 +14,7 @@ public interface Game<A, B> {
      *
      * @return a list of remaining valid moves
      */
-    List<Checkers.Moves<Square, Square>> getAllRemainingMoves(Map<Square, Mark> currentBoard);
+    List<Checkers.Moves<Square, Square, Square>> getAllRemainingMoves(Map<Square, Mark> currentBoard);
 
     /**
      * Creates the board, should be used on initial execution
