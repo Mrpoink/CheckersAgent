@@ -15,7 +15,7 @@ public class CheckersRunner extends Minimax<Square, Mark> {
     //Mark.R: AI
     //Mark.B: Human
 
-    private Mark turn = Mark.R;
+    private Mark turn = Mark.B; // Start with human player
     private final Checkers game;
 
     public CheckersRunner(Checkers game) {
@@ -29,12 +29,25 @@ public class CheckersRunner extends Minimax<Square, Mark> {
             game.printBoard(game.board);
             System.out.println();
             if(turn == Mark.B){
-                game.execute(getUserMove(), true);
-                turn = Mark.R;
-            }else{
-                System.out.println("AI turn: ");
-                game.execute(minimaxSearch(), false);
-                turn = Mark.B;
+                System.out.println("Your turn (B):");
+                Checkers.Moves<Square, Square> userMove = getUserMove();
+                if (userMove != null) {
+                    game.execute(userMove, true);
+                    turn = Mark.R;
+                } else {
+                    System.out.println("No valid moves available for player. Game over.");
+                    break;
+                }
+            } else {
+                System.out.println("AI turn (R):");
+                Checkers.Moves<Square, Square> aiMove = minimaxSearch();
+                if (aiMove != null) {
+                    game.execute(aiMove, false);
+                    turn = Mark.B;
+                } else {
+                    System.out.println("No valid moves available for AI. Game over.");
+                    break;
+                }
             }
         }
         game.printBoard(game.board);
@@ -42,63 +55,71 @@ public class CheckersRunner extends Minimax<Square, Mark> {
     }
 
     private Checkers.Moves<Square,Square> getUserMove(){
-        int row=-1, col=-1, grab_row=-1, grab_col=-1;
+        List<Checkers.Moves<Square, Square>> validMoves = game.getAllRemainingMoves(game.getBoard());
+        if (validMoves.isEmpty()) {
+            return null;
+        }
+
+        System.out.println("Valid moves: " + validMoves);
+
+        int fromRow = -1, fromCol = -1, toRow = -1, toCol = -1;
         boolean validInput = false;
         Scanner scan = new Scanner(System.in);
-        while(!validInput){
-            System.out.println("Your turn: enter row and column of piece to move (seperated by a space)" +
-                    " and then after two spaces enter where to move it (seperated by a space)");
 
-            if (scan.hasNextInt()){
-                grab_row = scan.nextInt();
-            }else{
-                scan.next();
-                continue;
-            }
-            if (scan.hasNextInt()) {
-                grab_col = scan.nextInt();
-            }else{
-                scan.next();
-                continue;
-            }if (scan.hasNextInt()){
-                row = scan.nextInt();
-            }else{
-                scan.next();
-                continue;
-            }
-            if (scan.hasNextInt()) {
-                col = scan.nextInt();
-            }else{
-                scan.next();
-                continue;
-            }
-            if (isValidMove(row, col) && isValidMove(grab_row, grab_col)){
-                validInput = true;
-            }else{
-                System.out.println("Invalid please try again");
+        while(!validInput){
+            System.out.println("Your turn: enter row and column of piece to move (separated by a space)" +
+                    " and then enter row and column of destination (separated by a space)");
+
+            try {
+                fromRow = scan.nextInt();
+                fromCol = scan.nextInt();
+                toRow = scan.nextInt();
+                toCol = scan.nextInt();
+
+                Square from = new Square(fromRow, fromCol);
+                Square to = new Square(toRow, toCol);
+                Checkers.Moves<Square, Square> move = new Checkers.Moves<>(from, to);
+
+                // Check if the move is in the list of valid moves
+                if (validMoves.contains(move)) {
+                    validInput = true;
+                    return move;
+                } else {
+                    System.out.println("Invalid move. Please select one of the valid moves.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter integers for row and column.");
+                scan.nextLine(); // Clear the scanner buffer
             }
         }
-        return new Checkers.Moves<>(new Square(grab_row, grab_col), new Square(row, col));
-    }
 
-    private boolean isValidMove(int row, int col){
-        boolean isWithinBounds = row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
-        return isWithinBounds && !game.markedSquare(new Square(row, col));
+        return null; // Should never reach here
     }
 
     private void announceWinner(int utility){
-        if (utility == 1){
-            System.out.println("\nPlayer (R) wins!!");
-        }else if(utility == -1){
-            System.out.println("\nAI (B) wins!!");
-        }else{
-            System.out.println("Its a draw!!");
+        // Count pieces for each player
+        int redCount = 0;
+        int blackCount = 0;
+        for (Mark mark : game.board.values()) {
+            if (mark == Mark.R) redCount++;
+            if (mark == Mark.B) blackCount++;
+        }
+
+        if (redCount == 0) {
+            System.out.println("\nPlayer (B) wins!!");
+        } else if (blackCount == 0) {
+            System.out.println("\nAI (R) wins!!");
+        } else if (utility > 0) {
+            System.out.println("\nAI (R) wins with score: " + utility);
+        } else if (utility < 0) {
+            System.out.println("\nPlayer (B) wins with score: " + utility);
+        } else {
+            System.out.println("It's a draw!!");
         }
     }
 
     public static void main(String[] args){
-        CheckersRunner runner  = new CheckersRunner(new Checkers(BOARD_SIZE));
+        CheckersRunner runner = new CheckersRunner(new Checkers(BOARD_SIZE));
         runner.play();
     }
-
 }

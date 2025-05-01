@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class Minimax<A, B> {
     protected final Checkers game;
+    private static final int MAX_DEPTH = 5; // Limit the search depth
 
     /**
      * Record to store the score of a game state and the path of moves leading to it.
@@ -36,7 +37,21 @@ public class Minimax<A, B> {
     public Checkers.Moves<Square, Square> minimaxSearch(){
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
-        ScoreMove<A> b = min(alpha, beta);
+        ScoreMove<A> b = min(alpha, beta, 0);
+
+        // Check if the path of moves is empty before getting the first element
+        if (b.pathOfMoves().isEmpty()) {
+            // If no valid moves found, return a default move or handle it appropriately
+            List<Checkers.Moves<Square, Square>> availableMoves = game.getAllRemainingMoves(game.getBoard());
+            if (!availableMoves.isEmpty()) {
+                return availableMoves.get(0); // Return first available move as fallback
+            } else {
+                // No moves available, might be a terminal state
+                System.out.println("No valid moves available!");
+                return null; // Handle this case in the calling code
+            }
+        }
+
         return b.pathOfMoves().getFirst();
     }
 
@@ -45,31 +60,42 @@ public class Minimax<A, B> {
      *
      * @return best score and path of moves for the MAX player
      */
-    public ScoreMove<A> max(Integer alpha, Integer beta){
-        System.out.println("Max: " + game.utility(game.board));
+    public ScoreMove<A> max(Integer alpha, Integer beta, int depth){
+        System.out.println("Max (depth " + depth + "): " + game.utility(game.board));
         List<Checkers.Moves<Square, Square>> bestPath = new ArrayList<>();
-        if(game.isTerminal(game.board)){
-            //Add best
-            return new ScoreMove<>(game.utility(game.board),bestPath);
+
+        // Return utility value if terminal node or maximum depth reached
+        if(game.isTerminal(game.board) || depth >= MAX_DEPTH){
+            return new ScoreMove<>(game.utility(game.board), bestPath);
         }else{
             int bestScore = Integer.MIN_VALUE;
+            List<Checkers.Moves<Square, Square>> moves = game.getAllRemainingMoves(game.getBoard());
 
-            for(Checkers.Moves<Square, Square> move : game.getAllRemainingMoves(game.getBoard())){
-                System.out.println(": " + move);
-                game.execute(move, true);
-                ScoreMove<A> a = min(alpha, beta);
-                System.out.println("path: " + a.pathOfMoves());
-                game.undo(move, true);
-                if (a.score() >= beta){
-                    return new ScoreMove<>(a.score(), a.pathOfMoves());
-                }
-                else if (a.score() > alpha){
-                    alpha = a.score();
-                    bestPath = a.pathOfMoves();
-                    bestPath.addFirst(move);
-                }
+            if (moves.isEmpty()) {
+                return new ScoreMove<>(game.utility(game.board), bestPath);
             }
-            return new ScoreMove<>(alpha,bestPath);
+
+            for(Checkers.Moves<Square, Square> move : moves){
+                System.out.println("Depth " + depth + ": " + move);
+                game.execute(move, true);
+                ScoreMove<A> a = min(alpha, beta, depth + 1);
+                game.undo(move, true);
+
+                if (a.score() > bestScore) {
+                    bestScore = a.score();
+                    List<Checkers.Moves<Square, Square>> newPath = new ArrayList<>();
+                    newPath.add(move);
+                    newPath.addAll(a.pathOfMoves());
+                    bestPath = newPath;
+                }
+
+                if (bestScore >= beta) {
+                    return new ScoreMove<>(bestScore, bestPath);
+                }
+
+                alpha = Math.max(alpha, bestScore);
+            }
+            return new ScoreMove<>(bestScore, bestPath);
         }
     }
 
@@ -78,30 +104,42 @@ public class Minimax<A, B> {
      *
      * @return best score and path of moves for the MIN player
      */
-    public ScoreMove<A> min(Integer alpha, Integer beta){
-        System.out.println("Min: " + game.utility(game.board));
+    public ScoreMove<A> min(Integer alpha, Integer beta, int depth){
+        System.out.println("Min (depth " + depth + "): " + game.utility(game.board));
         List<Checkers.Moves<Square, Square>> bestPath = new ArrayList<>();
-        if(game.isTerminal(game.board)){
+
+        // Return utility value if terminal node or maximum depth reached
+        if(game.isTerminal(game.board) || depth >= MAX_DEPTH){
             return new ScoreMove<>(game.utility(game.board), bestPath);
         }else {
             int bestScore = Integer.MAX_VALUE;
-            for (Checkers.Moves<Square, Square> move : game.getAllRemainingMoves(game.getBoard())) {
-                System.out.println(": " + move);
-                game.execute(move, false);
-                ScoreMove<A> b = max(alpha, beta);
-                System.out.println("b score: " +b.score());
-                game.undo(move, false);
-                if (b.score() <= alpha){
-                    return new ScoreMove<>(b.score(), b.pathOfMoves());
-                }
-                else if (b.score() < beta) {
-                    beta = b.score();
-                    bestPath = b.pathOfMoves();
-                    bestPath.addFirst(move);
-                }
-            }
-            return new ScoreMove<>(beta, bestPath);
-        }
+            List<Checkers.Moves<Square, Square>> moves = game.getAllRemainingMoves(game.getBoard());
 
+            if (moves.isEmpty()) {
+                return new ScoreMove<>(game.utility(game.board), bestPath);
+            }
+
+            for (Checkers.Moves<Square, Square> move : moves) {
+                System.out.println("Depth " + depth + ": " + move);
+                game.execute(move, false);
+                ScoreMove<A> b = max(alpha, beta, depth + 1);
+                game.undo(move, false);
+
+                if (b.score() < bestScore) {
+                    bestScore = b.score();
+                    List<Checkers.Moves<Square, Square>> newPath = new ArrayList<>();
+                    newPath.add(move);
+                    newPath.addAll(b.pathOfMoves());
+                    bestPath = newPath;
+                }
+
+                if (bestScore <= alpha) {
+                    return new ScoreMove<>(bestScore, bestPath);
+                }
+
+                beta = Math.min(beta, bestScore);
+            }
+            return new ScoreMove<>(bestScore, bestPath);
+        }
     }
 }
