@@ -43,6 +43,7 @@ public class CheckersRunner extends Minimax<Square, Mark> {
 
     private Checkers.Moves<Square,Square, Square> getUserMove(){
         int row=-1, col=-1, grab_row=-1, grab_col=-1;
+        Checkers.Moves<Square, Square, Square> playerMove = null;
         boolean validInput = false;
         Scanner scan = new Scanner(System.in);
         while(!validInput){
@@ -72,18 +73,24 @@ public class CheckersRunner extends Minimax<Square, Mark> {
                 scan.next();
                 continue;
             }
-            if (isValidMove(row, col) && isValidMove(grab_row, grab_col)){
+            playerMove = isValidMove(grab_row, grab_col, row, col);
+            if (playerMove != null){
                 validInput = true;
             }else{
                 System.out.println("Invalid please try again");
             }
         }
-        return new Checkers.Moves<>(new Square(grab_row, grab_col), new Square(row, col), null);
+        return playerMove;
     }
 
-    private boolean isValidMove(int row, int col){
-        boolean isWithinBounds = row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
-        return isWithinBounds && !game.markedSquare(new Square(row, col));
+    private Checkers.Moves<Square, Square, Square> isValidMove(int frow, int fcol, int trow, int tcol){
+        List<Checkers.Moves<Square, Square, Square>> validMoves = game.getAllRemainingMoves(game.board, Mark.B);
+        for (Checkers.Moves<Square, Square, Square> move : validMoves){
+            if ((new Square(frow, fcol)).equals(move.from()) && (new Square(trow, tcol)).equals(move.to())){
+                return move;
+            }
+        }
+        return null;
     }
 
     private void announceWinner(int utility){
